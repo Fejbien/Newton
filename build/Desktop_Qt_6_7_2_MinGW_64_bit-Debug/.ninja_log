@@ -1,0 +1,27 @@
+# ninja log v6
+7	826	7483083505418392	Netwon2_autogen/timestamp	293585a5f303d4c2
+7	826	7483083505418392	Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+7	826	7483083505418392	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/timestamp	293585a5f303d4c2
+7	826	7483083505418392	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+847	2873	7483083506693217	CMakeFiles/Netwon2.dir/parser.cpp.obj	77298f3a3bf90a23
+832	3100	7483083506544235	CMakeFiles/Netwon2.dir/Netwon2_autogen/mocs_compilation.cpp.obj	eea23fa2d0c872c6
+842	3197	7483083506647977	CMakeFiles/Netwon2.dir/mainwindow.cpp.obj	ece80d26fb6dd409
+33	249	7483083571056794	Netwon2_autogen/timestamp	293585a5f303d4c2
+33	249	7483083571056794	Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+33	249	7483083571056794	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/timestamp	293585a5f303d4c2
+33	249	7483083571056794	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+255	2701	7483083573278486	CMakeFiles/Netwon2.dir/mainwindow.cpp.obj	ece80d26fb6dd409
+28	231	7483083676859428	Netwon2_autogen/timestamp	293585a5f303d4c2
+28	231	7483083676859428	Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+28	231	7483083676859428	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/timestamp	293585a5f303d4c2
+28	231	7483083676859428	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+237	2457	7483083678930262	CMakeFiles/Netwon2.dir/mainwindow.cpp.obj	ece80d26fb6dd409
+232	5033	7483083678900069	CMakeFiles/Netwon2.dir/main.cpp.obj	4e12b74ce4e03397
+5034	6998	7483083726891249	Netwon2.exe	8efa998319fc2c23
+29	205	7483083988170732	Netwon2_autogen/timestamp	293585a5f303d4c2
+29	205	7483083988170732	Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+29	205	7483083988170732	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/timestamp	293585a5f303d4c2
+29	205	7483083988170732	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/mocs_compilation.cpp	293585a5f303d4c2
+211	2302	7483083989994316	CMakeFiles/Netwon2.dir/mainwindow.cpp.obj	ece80d26fb6dd409
+207	4772	7483083989941476	CMakeFiles/Netwon2.dir/main.cpp.obj	4e12b74ce4e03397
+4772	6538	7483084035596306	Netwon2.exe	8efa998319fc2c23
