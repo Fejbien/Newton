@@ -6,6 +6,16 @@
 #include <functional>
 
 // Jakby, co zlego to nie ja :3
+/*
+testy dla:
+
+x^2 + y - 1
+-y^2-x
+
+*/
+
+const double tol = 1e-6;            // Tolerancja dla zbieżności
+const int maxIter = 10000;            // Maksymalna liczba iteracji
 
 using namespace std;
 int currentMethod = 1;
@@ -113,22 +123,17 @@ void MainWindow::on_resultButton_clicked()
 {
     switch(currentMethod){
     case 1:{
-        // std::string str = ui->polynomialInput->text().toStdString();
-        // Polynomial poly(str);
-        // auto f = poly.getFunction();
-
-        double initialGuess = ui->initialGuessInput->text().toDouble();
-
-        /* test dla
-x^2 + y - 1
--y^2-x
-
-         */
-        // double root = newtonRaphson(f, initialGuess);
-
-        // ui->resultBox->setText(QString::number(root));
-        qDebug() << ui->textEdit->toPlainText();
+        double initialGuess = ui->initialGuessInput->text().toDouble();        
+        // qDebug() << ui->textEdit->toPlainText();
         auto array = splitByNewline(ui->textEdit->toPlainText().toStdString());
+        // Pozwala aby rownania konczyly sie na " = 0 "
+        int strPlacement = array.at(0).rfind('=');
+        if(strPlacement == -1) strPlacement = array.at(0).size();
+        array.at(0).resize(strPlacement);
+
+        strPlacement = array.at(1).rfind('=');
+        if(strPlacement == -1) strPlacement = array.at(1).size();
+        array.at(1).resize(strPlacement);
 
         // Parse the polynomials
         Polynomial p1(array.at(0));
@@ -139,15 +144,14 @@ x^2 + y - 1
         function<double(double, double)> func2 = p2.getFunction();
 
         // Print the parsed polynomials
-        cout << "Parsed first equation: ";
-        p1.print();
-        cout << "Parsed second equation: ";
-        p2.print();
+        // cout << "Parsed first equation: ";
+        // p1.print();
+        // cout << "Parsed second equation: ";
+        // p2.print();
 
         // Initial guesses for the solution
         vector<double> x = { initialGuess, initialGuess };  // Wstępne przybliżenia
-        double tol = 1e-6;            // Tolerancja dla zbieżności
-        int maxIter = 10000;            // Maksymalna liczba iteracji
+
 
         // Newton's method loop
         for (int iter = 0; iter < maxIter; iter++) {
@@ -164,10 +168,10 @@ x^2 + y - 1
             }
             normF = sqrt(normF);
             if (normF < tol) {
-                cout << "Solution found after " << iter << " iterations:" << endl;
-                QString str = "x1 = " + QString::number(x[0]) + ", x2 = " + QString::number(x[1]);
+                // cout << "Solution found after " << iter << " iterations:" << endl;
+                QString str = "x1 = " + QString::number(x[0]) + ", x2 = " + QString::number(x[1]) + "\n\nZnaleziono w " + QString::number(iter) + " iteracjach";
                 ui->resultBox->setText(str);
-                goto END;
+                return;
             }
 
             // Calculate delta_x (Newton's step)
@@ -176,10 +180,9 @@ x^2 + y - 1
                 x[i] -= delta_x[i];  // Update guesses
             }
         }
-        cout << "Maximum number of iterations exceeded." << endl;
 
-        END:
-        cout << "end";
+        ui->resultBox->setText("Maximum number of iterations exceeded.");
+
     }break;
     case 2:{
         //std::string str = ui->polynomialInput->text().toStdString();
@@ -206,11 +209,11 @@ QString resultBoxOld2 = "";
 void MainWindow::on_radioNetwon_clicked()
 {
     initialGuessInputOld2 = ui->initialGuessInput->text();
-    //polynomialInputOld2 = ui->polynomialInput->text();
+    polynomialInputOld2 = ui->textEdit->toPlainText();
     resultBoxOld2 = ui->resultBox->toPlainText();
 
     ui->initialGuessInput->setText(initialGuessInputOld1);
-    //ui->polynomialInput->setText(polynomialInputOld1);
+    ui->textEdit->setText(polynomialInputOld1);
     ui->resultBox->setText(resultBoxOld1);
 
     currentMethod = 1;
@@ -220,11 +223,11 @@ void MainWindow::on_radioNetwon_clicked()
 void MainWindow::on_radioInterval_clicked()
 {
     initialGuessInputOld1 = ui->initialGuessInput->text();
-    //polynomialInputOld1 = ui->polynomialInput->text();
+    polynomialInputOld1 = ui->textEdit->toPlainText();
     resultBoxOld1 = ui->resultBox->toPlainText();
 
     ui->initialGuessInput->setText(initialGuessInputOld2);
-    //ui->polynomialInput->setText(polynomialInputOld2);
+    ui->textEdit->setText(polynomialInputOld2);
     ui->resultBox->setText(resultBoxOld2);
 
     currentMethod = 2;
