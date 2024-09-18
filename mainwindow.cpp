@@ -124,7 +124,7 @@ vector<string> splitByNewline(const string& input) {
 }
 
 // Define a tolerance for comparing doubles
-const double TOLERANCE = 0.5;
+double TOLERANCE = 0.001;
 
 // Custom function to check if two vectors are "equal" considering floating-point precision
 bool areVectorsEqual(const std::vector<double>& a, const std::vector<double>& b) {
@@ -250,7 +250,8 @@ void MainWindow::on_resultButton_clicked()
                 }
             }
             if (isUnique) {
-                uniqueResults.push_back(vec);
+                if(vec[0] >= lower && vec[0] <= upper)
+                    uniqueResults.push_back(vec);
             }
         }
 
