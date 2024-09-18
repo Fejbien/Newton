@@ -4,15 +4,16 @@
 #include <regex>
 #include <cmath>
 #include <functional>
+#include "interval.h"  // Dodajemy nagłówek z definicją klasy Interval
 
-class Polynomial {
+class PolynomialInterval {
 public:
-    // Constructor that takes an equation string
-    Polynomial(const std::string& equation) {
+    // Konstruktor, który przyjmuje równanie jako string
+    PolynomialInterval(const std::string& equation) {
         parseEquation(equation);
     }
 
-    // Function to evaluate the polynomial for given values of x and y
+    // Funkcja do oceny wartości wielomianu dla podanych x i y (arytmetyka zmiennopozycyjna)
     double evaluate(double x, double y) const {
         double result = 0.0;
         for (const auto& term : terms) {
@@ -23,14 +24,38 @@ public:
         return result;
     }
 
-    // Create a callable function for polynomial evaluation
+    // Funkcja do oceny wartości wielomianu dla przedziałów (arytmetyka przedziałowa)
+    Interval evaluateAtInterval(const Interval& x, const Interval& y) const {
+        Interval result(0.0, 0.0);
+        for (const auto& term : terms) {
+            int powerX = term.first.first;
+            int powerY = term.first.second;
+
+            // Obliczamy potęgowanie przedziału x i y
+            Interval xPower = power(x, powerX);
+            Interval yPower = power(y, powerY);
+
+            // Mnożymy współczynnik przez x^powerX i y^powerY
+            result = result + (xPower * yPower * Interval(term.second, term.second));
+        }
+        return result;
+    }
+
+    // Funkcja, która zwraca callable działający na arytmetyce zmiennopozycyjnej
     std::function<double(double, double)> getFunction() const {
         return [this](double x, double y) {
             return this->evaluate(x, y);
         };
     }
 
-    // Function to print the polynomial equation
+    // Funkcja, która zwraca callable działający na arytmetyce przedziałowej
+    std::function<Interval(Interval, Interval)> getFunctionInterval() const {
+        return [this](Interval x, Interval y) {
+            return this->evaluateAtInterval(x, y);
+        };
+    }
+
+    // Funkcja do wypisywania równania wielomianu
     void print() const {
         bool firstTerm = true;
         for (auto it = terms.rbegin(); it != terms.rend(); ++it) {
@@ -55,12 +80,11 @@ public:
     }
 
 private:
-    // Map to store terms as (powerX, powerY) -> coefficient
+    // Mapa przechowująca składniki wielomianu jako (powerX, powerY) -> współczynnik
     std::map<std::pair<int, int>, double> terms;
 
-    // Function to parse the input polynomial equation
+    // Funkcja do parsowania równania wielomianu
     void parseEquation(std::string equation) {
-        // Split equation into lhs and rhs if there's an '=' sign
         size_t equalSignPos = equation.find('=');
         std::string lhs = equation;
         std::string rhs;
@@ -68,18 +92,15 @@ private:
         if (equalSignPos != std::string::npos) {
             lhs = equation.substr(0, equalSignPos);
             rhs = equation.substr(equalSignPos + 1);
-
-            // Negate the rhs and add to lhs as negative terms
-            parseSide(rhs, true);
+            parseSide(rhs, true); // Parsujemy prawą stronę równania jako ujemne wartości
         }
 
-        // Parse the lhs as normal
+        // Parsujemy lewą stronę
         parseSide(lhs, false);
     }
 
-    // Helper function to parse a single side of the equation
+    // Funkcja pomocnicza do parsowania jednej strony równania
     void parseSide(const std::string& side, bool negate) {
-        // Regex to match polynomial terms involving x, y, or constants
         std::regex termPattern(R"(([+-]?\s*\d*\.?\d*)(x(\^(\d+))?)?(y(\^(\d+))?)?)");
         auto begin = std::sregex_iterator(side.begin(), side.end(), termPattern);
         auto end = std::sregex_iterator();
@@ -92,52 +113,48 @@ private:
             std::string yPart = match[5].str();
             std::string yPowerStr = match[7].str();
 
-            // Remove spaces from coefficient string for correct conversion
             coeffStr.erase(std::remove_if(coeffStr.begin(), coeffStr.end(), ::isspace), coeffStr.end());
 
-            // Skip if no valid match (like empty strings)
-            if (coeffStr.empty() && xPart.empty() && yPart.empty()) {
-                continue;
-            }
+            if (coeffStr.empty() && xPart.empty() && yPart.empty()) continue;
 
-            double coefficient = 1.0;  // Default coefficient
+            double coefficient = 1.0;
             if (!coeffStr.empty() && coeffStr != "+" && coeffStr != "-") {
-                coefficient = std::stod(coeffStr);  // Parse the coefficient
-            }
-            else if (coeffStr == "-") {
-                coefficient = -1.0;  // Handle negative sign alone
-            }
-            else if (coeffStr == "+") {
-                coefficient = 1.0;   // Handle positive sign alone
+                coefficient = std::stod(coeffStr);
+            } else if (coeffStr == "-") {
+                coefficient = -1.0;
             }
 
-            // Negate the coefficient if parsing the right-hand side
-            if (negate) {
-                coefficient = -coefficient;
-            }
+            if (negate) coefficient = -coefficient;
 
-            int powerX = 0;  // Default power for x is 0 for constants
+            int powerX = 0;
             if (!xPart.empty()) {
                 if (xPowerStr.empty()) {
-                    powerX = 1;  // Implicit power of x (i.e., "x" means x^1)
-                }
-                else {
-                    powerX = std::stoi(xPowerStr);  // Extract explicit power of x
+                    powerX = 1;
+                } else {
+                    powerX = std::stoi(xPowerStr);
                 }
             }
 
-            int powerY = 0;  // Default power for y is 0 for constants
+            int powerY = 0;
             if (!yPart.empty()) {
                 if (yPowerStr.empty()) {
-                    powerY = 1;  // Implicit power of y (i.e., "y" means y^1)
-                }
-                else {
-                    powerY = std::stoi(yPowerStr);  // Extract explicit power of y
+                    powerY = 1;
+                } else {
+                    powerY = std::stoi(yPowerStr);
                 }
             }
 
-            // Add or accumulate the term in the map
             terms[{powerX, powerY}] += coefficient;
         }
+    }
+
+    // Funkcja do potęgowania przedziału
+    Interval power(const Interval& base, int exp) const {
+        if (exp == 0) return Interval(1, 1);
+        Interval result = base;
+        for (int i = 1; i < exp; ++i) {
+            result = result * base;
+        }
+        return result;
     }
 };

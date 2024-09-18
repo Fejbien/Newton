@@ -176,6 +176,26 @@
      <string>Max iteracji</string>
     </property>
    </widget>
+   <widget class="QLineEdit" name="initialGuessLowerInput">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>410</y>
+      <width>113</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="initialGuessUpperInput">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>410</y>
+      <width>113</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
