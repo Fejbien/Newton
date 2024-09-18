@@ -521,11 +521,9 @@ Netwon2_autogen/timestamp: \
 	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/3.29.3/CMakeRCCompiler.cmake \
 	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/3.29.3/CMakeSystem.cmake \
 	C:/Users/User/Desktop/Git/Netwon2/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/Netwon2_autogen/moc_predefs.h \
-	C:/Users/User/Desktop/Git/Netwon2/interval.h \
 	C:/Users/User/Desktop/Git/Netwon2/main.cpp \
 	C:/Users/User/Desktop/Git/Netwon2/mainwindow.cpp \
 	C:/Users/User/Desktop/Git/Netwon2/mainwindow.h \
 	C:/Users/User/Desktop/Git/Netwon2/parser.cpp \
-	C:/Users/User/Desktop/Git/Netwon2/parserInterval.cpp \
 	C:/Users/User/Desktop/Git/Netwon2/mainwindow.ui \
 	C:/Qt/Tools/CMake_64/bin/cmake.exe

@@ -1,14 +1,13 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "parser.cpp"
-#include "parserInterval.cpp"
-#include "interval.h"
 
 #include <iostream>
 #include <cmath>
 #include <functional>
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <algorithm>
 
 // Jakby, co zlego to nie ja :3
 /*
@@ -56,30 +55,9 @@ double partialDerivative(function<double(double, double)> func, double x1, doubl
     }
 }
 
-// Tworzenie funkcji pochodnych dla przedziałów
-Interval partialDerivative(function<Interval(Interval, Interval)> func, const Interval& x1, const Interval& x2, bool respectToX1) {
-    Interval h(1e-6, 1e-6);  // Krok dla różniczkowania numerycznego
-    if (respectToX1) {
-        return (func(x1 + h, x2) - func(x1, x2)) / h;
-    }
-    else {
-        return (func(x1, x2 + h) - func(x1, x2)) / h;
-    }
-}
-
 // Definiowanie Jacobianu numerycznie
 vector<vector<double>> jacobian(const vector<double>& x, const function<double(double, double)>& f1, const function<double(double, double)>& f2) {
     vector<vector<double>> J(2, vector<double>(2));
-    J[0][0] = partialDerivative(f1, x[0], x[1], true);  // d(f1)/d(x1)
-    J[0][1] = partialDerivative(f1, x[0], x[1], false); // d(f1)/d(x2)
-    J[1][0] = partialDerivative(f2, x[0], x[1], true);  // d(f2)/d(x1)
-    J[1][1] = partialDerivative(f2, x[0], x[1], false); // d(f2)/d(x2)
-    return J;
-}
-
-// Definiowanie Jacobianu dla przedziałów
-vector<vector<Interval>> jacobian(const vector<Interval>& x, const function<Interval(Interval, Interval)>& f1, const function<Interval(Interval, Interval)>& f2) {
-    vector<vector<Interval>> J(2, vector<Interval>(2));
     J[0][0] = partialDerivative(f1, x[0], x[1], true);  // d(f1)/d(x1)
     J[0][1] = partialDerivative(f1, x[0], x[1], false); // d(f1)/d(x2)
     J[1][0] = partialDerivative(f2, x[0], x[1], true);  // d(f2)/d(x1)
@@ -135,54 +113,6 @@ vector<double> gaussElimination(const vector<vector<double>>& A, const vector<do
     return x;
 }
 
-// Eliminacja Gaussa dla przedziałów
-vector<Interval> gaussElimination(const vector<vector<Interval>>& A, const vector<Interval>& b) {
-    int n = A.size();
-    vector<vector<Interval>> augmentedMatrix(n, vector<Interval>(n + 1));
-
-    // Tworzenie macierzy rozszerzonej
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            augmentedMatrix[i][j] = A[i][j];
-        }
-        augmentedMatrix[i][n] = b[i];
-    }
-
-    // Eliminacja Gaussa
-    for (int i = 0; i < n; i++) {
-        int maxRow = i;
-        for (int k = i + 1; k < n; k++) {
-            if (fabs(augmentedMatrix[k][i].lower) > fabs(augmentedMatrix[maxRow][i].lower)) {
-                maxRow = k;
-            }
-        }
-        for (int k = i; k < n + 1; k++) {
-            swap(augmentedMatrix[maxRow][k], augmentedMatrix[i][k]);
-        }
-
-        for (int k = i + 1; k < n; k++) {
-            Interval c = -augmentedMatrix[k][i] / augmentedMatrix[i][i];
-            for (int j = i; j < n + 1; j++) {
-                if (i == j) {
-                    augmentedMatrix[k][j] = Interval(0, 0);
-                }
-                else {
-                    augmentedMatrix[k][j] = augmentedMatrix[k][j] + c * augmentedMatrix[i][j];
-                }
-            }
-        }
-    }
-
-    vector<Interval> x(n);
-    for (int i = n - 1; i >= 0; i--) {
-        x[i] = augmentedMatrix[i][n] / augmentedMatrix[i][i];
-        for (int k = i - 1; k >= 0; k--) {
-            augmentedMatrix[k][n] = augmentedMatrix[k][n] - augmentedMatrix[k][i] * x[i];
-        }
-    }
-    return x;
-}
-
 vector<string> splitByNewline(const string& input) {
     vector<string> lines;
     stringstream ss(input);
@@ -193,10 +123,28 @@ vector<string> splitByNewline(const string& input) {
     return lines;
 }
 
+// Define a tolerance for comparing doubles
+const double TOLERANCE = 1e-3;
+
+// Custom function to check if two vectors are "equal" considering floating-point precision
+bool areVectorsEqual(const std::vector<double>& a, const std::vector<double>& b) {
+    if (a.size() != b.size()) {
+        return false;  // Vectors of different sizes cannot be equal
+    }
+
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (std::fabs(a[i] - b[i]) > TOLERANCE) {  // Compare with tolerance
+            return false;  // If any element differs more than the tolerance, they are not equal
+        }
+    }
+    return true;
+}
+
 void MainWindow::on_resultButton_clicked()
 {
     switch(currentMethod){
-    case 1:{
+    case 1: {
+        // Case 1: Newton's method with doubles
         double initialGuess = ui->initialGuessInput->text().toDouble();
         auto array = splitByNewline(ui->textEdit->toPlainText().toStdString());
 
@@ -206,7 +154,7 @@ void MainWindow::on_resultButton_clicked()
         function<double(double, double)> func1 = p1.getFunction();
         function<double(double, double)> func2 = p2.getFunction();
 
-        vector<double> x = { initialGuess, initialGuess };  // Wstępne przybliżenia
+        vector<double> x = { initialGuess, initialGuess };  // Initial guesses
 
         for (int iter = 0; iter <= maxIter; iter++) {
             vector<double> f = { func1(x[0], x[1]), func2(x[0], x[1]) };
@@ -218,8 +166,8 @@ void MainWindow::on_resultButton_clicked()
             }
             normF = sqrt(normF);
             if (normF < tol) {
-                QString str = "x = " + QString::number(x[0]) + ", y = " + QString::number(x[1]) + "\n\nZnaleziono w " + QString::number(iter) + " iteracjach"
-                              + "\nEpsilon: " + QString::number(tol) + ", Max iteracji: " + QString::number(maxIter);
+                QString str = "x = " + QString::number(x[0]) + ", y = " + QString::number(x[1]) + "\n\nFound in " + QString::number(iter) + " iterations"
+                              + "\nEpsilon: " + QString::number(tol) + ", Max iterations: " + QString::number(maxIter);
                 ui->resultBox->setText(str);
                 return;
             }
@@ -231,53 +179,98 @@ void MainWindow::on_resultButton_clicked()
         }
 
         ui->resultBox->setText("Maximum number of iterations exceeded.");
-    }break;
+    } break;
 
     case 2: {
-        double initialLower = ui->initialGuessLowerInput->text().toDouble();
-        double initialUpper = ui->initialGuessUpperInput->text().toDouble();
-        Interval initialGuess(initialLower, initialUpper);
+        // Case 1: Newton's method with doubles
+        string input = ui->initialGuessInput->text().toStdString();
+
+        // Remove square brackets and semicolon
+        input = input.substr(1, input.size() - 2);  // Removes the [ and ]
+
+        // Replace the semicolon with a space for easier parsing
+        size_t semicolonPos = input.find(';');
+        input[semicolonPos] = ' ';
+
+        double lower, upper;
+        // Use stringstream to extract the two numbers
+        std::stringstream ss(input);
+        ss >> lower >> upper;
+
+        cout << lower << upper << endl;
 
         auto array = splitByNewline(ui->textEdit->toPlainText().toStdString());
-        int strPlacement = array.at(0).rfind('=');
-        if (strPlacement == -1) strPlacement = array.at(0).size();
-        array.at(0).resize(strPlacement);
 
-        strPlacement = array.at(1).rfind('=');
-        if (strPlacement == -1) strPlacement = array.at(1).size();
-        array.at(1).resize(strPlacement);
+        Polynomial p1(array.at(0));
+        Polynomial p2(array.at(1));
 
-        PolynomialInterval p1(array.at(0));
-        PolynomialInterval p2(array.at(1));
+        function<double(double, double)> func1 = p1.getFunction();
+        function<double(double, double)> func2 = p2.getFunction();
 
-        function<Interval(Interval, Interval)> func1 = p1.getFunctionInterval();
-        function<Interval(Interval, Interval)> func2 = p2.getFunctionInterval();
+        vector<vector<double>> results = vector<vector<double>>();
 
-        vector<Interval> x = { initialGuess, initialGuess };  // Wstępne przybliżenia
-
-        for (int iter = 0; iter <= maxIter; iter++) {
-            vector<Interval> f = { func1(x[0], x[1]), func2(x[0], x[1]) };
-            vector<vector<Interval>> J = jacobian(x, func1, func2);
-
-            if (f[0].containsZero() && f[1].containsZero()) {
-
-                QString str = "x = [" + QString::number(x[0].lower) + ", " + QString::number(x[0].upper) + "], y = [" + QString::number(x[1].lower) + ", " + QString::number(x[1].upper) + "]\n\nZnaleziono w " + QString::number(iter) + " iteracjach"
-                              + "\nEpsilon: " + QString::number(tol) + ", Max iteracji: " + QString::number(maxIter);
-                ui->resultBox->setText(str);
-
-                return;
+        for(int i = lower * 10; i < upper * 10; i++){
+            cout << i << endl;
+            vector<double> x = { ((double)i)/10, ((double)i)/10 };  // Initial guesses
+            for (const auto& row : results) {
+                for (const auto& element : row) {
+                    std::cout << element << " ";  // Print each element in the row
+                }
+                std::cout << std::endl;  // Newline after each row
             }
 
-            vector<Interval> delta_x = gaussElimination(J, f);
-            for (int i = 0; i < x.size(); i++) {
-                x[i] = x[i] - delta_x[i];
+            for (int iter = 0; iter <= maxIter; iter++) {
+                vector<double> f = { func1(x[0], x[1]), func2(x[0], x[1]) };
+                vector<vector<double>> J = jacobian(x, func1, func2);
+
+                double normF = 0;
+                for (double val : f) {
+                    normF += val * val;
+                }
+                normF = sqrt(normF);
+                if (normF < tol) {
+                    results.push_back({x[0], x[1]});  // Use an initializer list to push both x[0] and x[1]
+                    break;
+                }
+
+                vector<double> delta_x = gaussElimination(J, f);
+                for (int i = 0; i < x.size(); i++) {
+                    x[i] -= delta_x[i];
+                }
+            }
+
+            ui->resultBox->setText("Maximum number of iterations exceeded.");
+        }
+
+        // Create a new vector to store unique vectors
+        std::vector<std::vector<double>> uniqueResults;
+
+        // Iterate over the results and add unique vectors to uniqueResults
+        for (const auto& vec : results) {
+            bool isUnique = true;
+            for (const auto& uniqueVec : uniqueResults) {
+                if (areVectorsEqual(vec, uniqueVec)) {
+                    isUnique = false;
+                    break;
+                }
+            }
+            if (isUnique) {
+                uniqueResults.push_back(vec);
             }
         }
 
-        cout << "Maximum number of iterations exceeded." << endl;
-    }break;
+        QString str = "";
+
+        for(int i = 0; i < uniqueResults.size(); i++){
+            str += "\nx = " + QString::number(uniqueResults[i][0]) + ", y = " + QString::number(uniqueResults[i][1]);
+        }
+
+        ui->resultBox->setText(str);
+
+    } break;
     }
 }
+
 
 QString initialGuessInputOld1 = "";
 QString polynomialInputOld1 = "";
@@ -297,6 +290,7 @@ void MainWindow::on_radioNetwon_clicked()
     ui->textEdit->setText(polynomialInputOld1);
     ui->resultBox->setText(resultBoxOld1);
 
+     ui->label_2->setText("Podaj zmienna");
     currentMethod = 1;
 }
 
@@ -310,6 +304,7 @@ void MainWindow::on_radioInterval_clicked()
     ui->textEdit->setText(polynomialInputOld2);
     ui->resultBox->setText(resultBoxOld2);
 
+    ui->label_2->setText("Podaj przedzial np: [-2;3]");
     currentMethod = 2;
 }
 

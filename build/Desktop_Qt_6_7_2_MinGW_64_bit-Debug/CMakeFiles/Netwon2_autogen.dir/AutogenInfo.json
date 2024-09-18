@@ -257,12 +257,6 @@
 	"HEADERS" : 
 	[
 		[
-			"C:/Users/User/Desktop/Git/Netwon2/interval.h",
-			"MU",
-			"EWIEGA46WW/moc_interval.cpp",
-			null
-		],
-		[
 			"C:/Users/User/Desktop/Git/Netwon2/mainwindow.h",
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
@@ -342,8 +336,7 @@
 	[
 		[ "C:/Users/User/Desktop/Git/Netwon2/main.cpp", "MU", null ],
 		[ "C:/Users/User/Desktop/Git/Netwon2/mainwindow.cpp", "MU", null ],
-		[ "C:/Users/User/Desktop/Git/Netwon2/parser.cpp", "MU", null ],
-		[ "C:/Users/User/Desktop/Git/Netwon2/parserInterval.cpp", "MU", null ]
+		[ "C:/Users/User/Desktop/Git/Netwon2/parser.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
