@@ -209,15 +209,10 @@ void MainWindow::on_resultButton_clicked()
 
         vector<vector<double>> results = vector<vector<double>>();
 
+        // Tak zgadza sie sprawdza sie jest to zjebane
         for(int i = lower * 10; i < upper * 10; i++){
             cout << i << endl;
             vector<double> x = { ((double)i)/10, ((double)i)/10 };  // Initial guesses
-            for (const auto& row : results) {
-                for (const auto& element : row) {
-                    std::cout << element << " ";  // Print each element in the row
-                }
-                std::cout << std::endl;  // Newline after each row
-            }
 
             for (int iter = 0; iter <= maxIter; iter++) {
                 vector<double> f = { func1(x[0], x[1]), func2(x[0], x[1]) };
