@@ -24,6 +24,10 @@ private slots:
 
     void on_radioInterval_clicked();
 
+    void on_epsilonEdit_textChanged(const QString &arg1);
+
+    void on_maxIterEdit_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
 };

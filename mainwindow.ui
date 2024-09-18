@@ -56,7 +56,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>120</y>
+      <y>100</y>
       <width>231</width>
       <height>31</height>
      </rect>
@@ -108,7 +108,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>90</y>
+      <y>80</y>
       <width>231</width>
       <height>21</height>
      </rect>
@@ -121,10 +121,59 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>40</y>
+      <y>30</y>
       <width>231</width>
       <height>46</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="epsilonEdit">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>160</y>
+      <width>113</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="locale">
+     <locale language="Polish" country="Poland"/>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="maxIterEdit">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>160</y>
+      <width>113</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>135</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Epsilon</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>136</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Max iteracji</string>
     </property>
    </widget>
   </widget>

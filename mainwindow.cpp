@@ -4,6 +4,9 @@
 #include <iostream>
 #include <cmath>
 #include <functional>
+#include <QDoubleValidator>
+#include <QIntValidator>
+
 
 // Jakby, co zlego to nie ja :3
 /*
@@ -14,8 +17,8 @@ x^2 + y - 1
 
 */
 
-const double tol = 1e-6;            // Tolerancja dla zbieżności
-const int maxIter = 10000;            // Maksymalna liczba iteracji
+double tol = 1e-6;            // Tolerancja dla zbieżności
+int maxIter = 10000;            // Maksymalna liczba iteracji
 
 using namespace std;
 int currentMethod = 1;
@@ -25,6 +28,14 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QDoubleValidator *val = new QDoubleValidator();
+    val->setNotation(QDoubleValidator::ScientificNotation);
+    ui->epsilonEdit->setValidator(val);
+    ui->maxIterEdit->setValidator(new QIntValidator());
+
+    ui->epsilonEdit->setText(QString::number(tol));
+    ui->maxIterEdit->setText(QString::number(maxIter));
 }
 
 MainWindow::~MainWindow()
@@ -154,7 +165,7 @@ void MainWindow::on_resultButton_clicked()
 
 
         // Newton's method loop
-        for (int iter = 0; iter < maxIter; iter++) {
+        for (int iter = 0; iter <= maxIter; iter++) {
             // Calculate the function values
             vector<double> f = { func1(x[0], x[1]), func2(x[0], x[1]) };
 
@@ -169,7 +180,8 @@ void MainWindow::on_resultButton_clicked()
             normF = sqrt(normF);
             if (normF < tol) {
                 // cout << "Solution found after " << iter << " iterations:" << endl;
-                QString str = "x1 = " + QString::number(x[0]) + ", x2 = " + QString::number(x[1]) + "\n\nZnaleziono w " + QString::number(iter) + " iteracjach";
+                QString str = "x1 = " + QString::number(x[0]) + ", x2 = " + QString::number(x[1]) + "\n\nZnaleziono w " + QString::number(iter) + " iteracjach"
+                              + "\nEpsilon: " + QString::number(tol) + ", Max iteracji: " + QString::number(maxIter);
                 ui->resultBox->setText(str);
                 return;
             }
@@ -231,5 +243,37 @@ void MainWindow::on_radioInterval_clicked()
     ui->resultBox->setText(resultBoxOld2);
 
     currentMethod = 2;
+}
+
+
+void MainWindow::on_epsilonEdit_textChanged(const QString &arg1)
+{
+    string str = arg1.toStdString();
+    for (int i = 0; i < str.size(); i++)
+        if(str[i] == ',') str[i] = '.';
+
+    //cout << str << endl;
+
+    double dbl = 0.0;
+    std::istringstream num(str);
+
+    num >> dbl;
+
+    if(!num.fail() &&
+        num.eof()) // This second test is important! This makes sure that the entire string was converted to a number
+    {
+        tol = dbl;
+    }
+    else
+    {
+        // failure
+        cout << "Nie dobrze XD" << endl;
+    }
+}
+
+
+void MainWindow::on_maxIterEdit_textChanged(const QString &arg1)
+{
+    maxIter = arg1.toInt();
 }
 
